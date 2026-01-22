@@ -18,19 +18,16 @@ namespace ServerSide
     internal class ServerListener
     {
         
-        internal void StartListener()
-        {
+        internal void StartListener() {
             TcpListener server = null;
 
-            try
-            {
+            try {
                 Int32 port = 5000;      // This should not be hard coded but added into config file
                 IPAddress localAddress = IPAddress.Parse("127.0.0.1");    // again added to config file
 
                 server.Start();
 
-                while(true)
-                {
+                while(true) {
                     // console writing used for debugging
                     Console.WriteLine("Waiting for connection...\n");
 
@@ -42,12 +39,10 @@ namespace ServerSide
                     Task.Run(() => Worker(client));     // I don't understand tasks, clearly, couldn't get this to run without a lambda
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine(ex.Message);      // move to UI class when created
             }
-            finally
-            {
+            finally {
                 // stops the server as the final step of try/catch
                 server.Stop();
             }
@@ -61,8 +56,7 @@ namespace ServerSide
         Parameters    : N/A
         Return Values : N/A
         */
-        public void Worker(Object task)     // should probably give this a better name than "Worker"
-        {
+        public void Worker(Object task){     // should probably give this a better name than "Worker"
             // cast the object to a TcpClient object
             TcpClient client = (TcpClient)task;
 
@@ -74,8 +68,7 @@ namespace ServerSide
             int i;
 
             // currently this is just receiving the client communication and not doing anything
-            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-            {
+            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
                 data = Encoding.ASCII.GetString(bytes, 0, i);
 
                 // console write for debugging
