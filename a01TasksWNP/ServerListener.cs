@@ -90,12 +90,16 @@ namespace ServerSide {
 
             int i;
 
+            string filePath = ConfigurationManager.AppSettings["FilePath"];
+
             // currently this is just receiving the client communication and not doing anything
             while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
                 data = Encoding.ASCII.GetString(bytes, 0, i);
 
                 // console write for debugging
                 Console.WriteLine("Received: {0}\n", data);
+
+                FileIO.FileWrite(filePath , data);
             }
 
             // sutdown and end connection

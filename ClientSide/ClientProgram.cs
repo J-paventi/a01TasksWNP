@@ -21,6 +21,15 @@ namespace ClientSide {
         static void Main(string[] args) {
             Client client = new Client();
             client.Connect();
+
+            int i = 0;
+            while (true) { //cancellation token.
+                client.SendData(client.GenerateData());
+
+                //for debugging
+                i++;
+                if(i > 10) break;
+            }
         }
     }
 }

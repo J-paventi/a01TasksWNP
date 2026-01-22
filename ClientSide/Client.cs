@@ -35,6 +35,43 @@ namespace ClientSide {
             //Establist connection to server.
             client = new TcpClient(serverIP, serverPort);
             stream = client.GetStream();
+
+            return;
+        }
+
+        /*
+        Method        : SendData
+        Description   : 
+        Parameters    : string data     :   
+        Return Values : N/A
+        */
+        internal void SendData(string data) {
+            byte[] byteData = Encoding.ASCII.GetBytes(data);
+            stream.Write(byteData, 0, byteData.Length);
+
+            return;
+        }
+
+        /*
+        Method        : GenerateData
+        Description   : 
+        Parameters    : N/A  
+        Return Values : string          :   
+        */
+        internal string GenerateData(){ 
+            Random numberOfGUIDS = new Random();
+            int max = numberOfGUIDS.Next(1, 101);
+            string data = string.Empty;
+
+            for (int i = 0; i < max; i++){
+                string part = Guid.NewGuid().ToString();
+                data += part; 
+            }
+            // for debugging
+            Console.WriteLine(data);
+            Console.WriteLine(max);
+
+            return data;
         }
 
     }

@@ -15,6 +15,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ServerSide {
     internal class FileIO {
@@ -27,7 +28,7 @@ namespace ServerSide {
                         string data     :   data to write to file.
         Return Values : N/A
         */
-        internal void FileWrite(string path, string data){
+        internal static void FileWrite(string path, string data){
              lock (locker){
                 try{ 
                     using (StreamWriter sw = new StreamWriter(path, true)) {
@@ -44,13 +45,11 @@ namespace ServerSide {
         /*
         Method        : FileGetSize
         Description   : 
-        Parameters    : N/A
-        Return Values : N/A
+        Parameters    : string path     :   path of file to get size of.
+        Return Values : long            :   returns a long with the current size of the file
         */
-        internal void FileGetSize(){ 
-            
-            
-            return; 
+        internal static long FileGetSize(string path){ 
+            return new FileInfo(path).Length;
         }
     }
 }
