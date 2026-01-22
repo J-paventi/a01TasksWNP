@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,20 +19,31 @@ namespace ServerSide {
     */
     internal class ServerListener {
 
-    private const int kMaxByteSize = 1024;
+        private int kMaxByteSize = 1024;
+        private int kMaxFileSize;
         
         internal void StartListener() {
             TcpListener server = null;
+            string serverIP = ConfigurationManager.AppSettings["ServerIP"];
+            string serverPortStr = ConfigurationManager.AppSettings["ServerPort"];
+            string serverBufferSize = ConfigurationManager.AppSettings["BufferSize"];
+            int.TryParse(serverBufferSize, out kMaxByteSize);
+            string serverMaxClients = ConfigurationManager.AppSettings["MaxClients"];
+            string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
+            int.TryParse(serverMaxFileSize, out kMaxFileSize);
 
             try {
-                Int32 port = 13000;      // This should not be hard coded but added into config file
-                IPAddress localAddress = IPAddress.Parse("127.0.0.1");    // again added to config file
+                int port = 0;
+                int.TryParse(serverPortStr, out port);
+                IPAddress localAddress = IPAddress.Parse(serverIP);    // again added to config file
+
 
                 server = new TcpListener(localAddress, port);
 
                 server.Start();
 
                 while(true) {
+
                     // console writing used for debugging
                     Console.WriteLine("Waiting for connection...\n");
 
