@@ -39,7 +39,7 @@ namespace ServerSide
                     // more dubigging console writes
                     Console.WriteLine("Connected!");
 
-                    Task.Run(() => Worker(client));     // I don't understand tasks clearly, couldn't get this to run without a lambda
+                    Task.Run(() => Worker(client));     // I don't understand tasks, clearly, couldn't get this to run without a lambda
                 }
             }
             catch (Exception ex)
@@ -71,7 +71,19 @@ namespace ServerSide
 
             NetworkStream stream = client.GetStream();
 
+            int i;
 
+            // currently this is just receiving the client communication and not doing anything
+            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+            {
+                data = Encoding.ASCII.GetString(bytes, 0, i);
+
+                // console write for debugging
+                Console.WriteLine("Received: {0}\n", data);
+            }
+
+            // sutdown and end connection
+            client.Close();
         }
     }
 }
