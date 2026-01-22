@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+*	FILE	        :   ServerListener.cs
+*	PROJECT         :   A01 Tasks - Windows Network Programming
+*   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
+*   FIRST VERSION   :   
+*   DESCRIPTION     :   
+*/
+
+using System;
 using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
@@ -67,7 +75,8 @@ namespace ServerSide {
         /*
         Method        : Worker
         Description   : 
-        Parameters    : N/A
+        Parameters    : Object task     :   the task object that is passed to the Worker
+                                            in order to have it work independently
         Return Values : N/A
         */
         public void Worker(Object task){     // should probably give this a better name than "Worker"
@@ -91,6 +100,8 @@ namespace ServerSide {
 
             // sutdown and end connection
             client.Close();
+
+            return;
         }
     }
 }
