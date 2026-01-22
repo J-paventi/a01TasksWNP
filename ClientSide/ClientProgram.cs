@@ -7,19 +7,20 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net;
-using System.Net.Sockets;
-using System.Timers;
 
-namespace a01TasksWNP
-{
-    internal class Program
-    {
+
+namespace ClientSide {
+    internal class ClientProgram {
         static void Main(string[] args) {
-
+            Client client = new Client();
+            client.Connect();
         }
     }
 }

@@ -7,23 +7,27 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerSide
-{
+
+namespace ServerSide {
+
     /*
     Method        : StartListener
     Description   : 
     Parameters    : N/A
     Return Values : N/A
     */
-    internal class ServerListener
-    {
+    internal class ServerListener {
+
+    private const int kMaxByteSize = 1024;
         
         internal void StartListener() {
             TcpListener server = null;
 
             try {
-                Int32 port = 5000;      // This should not be hard coded but added into config file
+                Int32 port = 13000;      // This should not be hard coded but added into config file
                 IPAddress localAddress = IPAddress.Parse("127.0.0.1");    // again added to config file
+
+                server = new TcpListener(localAddress, port);
 
                 server.Start();
 
@@ -38,11 +42,9 @@ namespace ServerSide
 
                     Task.Run(() => Worker(client));     // I don't understand tasks, clearly, couldn't get this to run without a lambda
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Console.WriteLine(ex.Message);      // move to UI class when created
-            }
-            finally {
+            } finally {
                 // stops the server as the final step of try/catch
                 server.Stop();
             }
@@ -60,7 +62,7 @@ namespace ServerSide
             // cast the object to a TcpClient object
             TcpClient client = (TcpClient)task;
 
-            Byte[] bytes = new byte[1024];      // this can be changed, literally just a default value I'm using
+            Byte[] bytes = new byte[kMaxByteSize];      // this can be changed, literally just a default value I'm using
             string data = null;
 
             NetworkStream stream = client.GetStream();
