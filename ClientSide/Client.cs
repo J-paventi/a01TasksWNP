@@ -26,6 +26,7 @@ namespace ClientSide {
         Return Values : N/A
         */
         internal void Run() {
+            Connect(); 
 
             int i = 0;
             while (true) { //cancellation token.
@@ -90,6 +91,5 @@ namespace ClientSide {
 
             return data;
         }
-
     }
 }

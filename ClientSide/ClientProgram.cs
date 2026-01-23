@@ -29,9 +29,9 @@ namespace ClientSide {
 
 
             Client clientSender = new Client();
-            Task sendTask = new Task(clientSender.Connect);
-
-            clientSender.Run();
+            Task sendTask = new Task(clientSender.Run);
+            sendTask.Start();
+            sendTask.Wait();
         }
     }
 }
