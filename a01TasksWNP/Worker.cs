@@ -21,35 +21,42 @@ namespace ServerSide {
                                             in order to have it work independently
         Return Values : N/A
         */
-        public void WorkerTask(Object task, int MaxByteSize)
+        public void WorkerTask(Object task)
         {     // should probably give this a better name than "Worker"
 
-            // cast the object to a TcpClient object
-            TcpClient client = (TcpClient)task;
+            //WorkerTasks taskInfo = (WorkerTasks)task;
+            if (task is WorkerTasks info) {
 
-            Byte[] bytes = new byte[MaxByteSize];      // this can be changed, literally just a default value I'm using
-            string data = null;
 
-            NetworkStream stream = client.GetStream();
 
-            int i;
+                //cast MaxByteSize to int
+                int mByteSize = info.maxByteSize;
 
-            string filePath = ConfigurationManager.AppSettings["FilePath"];
+                // cast the object to a TcpClient object
+                TcpClient client = info.client;
 
-            // currently this is just receiving the client communication and not doing anything
-            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-            {
-                data = Encoding.ASCII.GetString(bytes, 0, i);
+                Byte[] bytes = new byte[mByteSize];      // this can be changed, literally just a default value I'm using
+                string data = null;
 
-                // console write for debugging
-                Console.WriteLine("Received: {0}\n", data);
+                NetworkStream stream = client.GetStream();
 
-                FileIO.FileWrite(filePath, data);
+                int i;
+
+                string filePath = ConfigurationManager.AppSettings["FilePath"];
+
+                // currently this is just receiving the client communication and not doing anything
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
+                    data = Encoding.ASCII.GetString(bytes, 0, i);
+
+                    // console write for debugging
+                    Console.WriteLine("Received: {0}\n", data);
+
+                    FileIO.FileWrite(filePath, data);
+                }
+
+                // sutdown and end connection
+                client.Close();
             }
-
-            // sutdown and end connection
-            client.Close();
-
             return;
         }
     }

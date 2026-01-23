@@ -19,6 +19,11 @@ using System.Threading.Tasks;
 
 namespace ServerSide {
 
+        struct WorkerTasks{
+            public TcpClient client;
+            public int maxByteSize;
+
+        };
     /*
     Method        : StartListener
     Description   : 
@@ -29,6 +34,7 @@ namespace ServerSide {
 
         private int kMaxByteSize = 1024;
         private int kMaxFileSize;
+
         
         internal void StartListener() {
             TcpListener server = null;
@@ -60,8 +66,13 @@ namespace ServerSide {
                     // more dubigging console writes
                     Console.WriteLine("Connected!");
 
+                    WorkerTasks tasks = new WorkerTasks();
+                    tasks.client = client;
+                    tasks.maxByteSize = kMaxByteSize;
+
+
                     Worker work = new Worker();
-                    Task worker = new Task(work.WorkerTask(client, kMaxByteSize));
+                    Task worker = new Task(work.WorkerTask, tasks);
                     //Task.Run(() => .WorkerTask(client, kMaxByteSize));     // I don't understand tasks, clearly, couldn't get this to run without a lambda
                 }
             } catch (Exception ex) {
@@ -73,6 +84,8 @@ namespace ServerSide {
 
             return;
         }
+
+
 
         /*
         Method        : Worker
