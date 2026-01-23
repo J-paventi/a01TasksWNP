@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace ClientSide {
     internal class ClientProgram {
-        static void Main(string[] args) {
+        static async Task Main(string[] args) {
 
             //create token
 
@@ -29,8 +29,9 @@ namespace ClientSide {
 
 
             Client clientSender = new Client();
-            Task sendTask = new Task(clientSender.Run);
+            Task sendTask = new Task(clientSender.Connect);
 
+            clientSender.Run();
         }
     }
 }
