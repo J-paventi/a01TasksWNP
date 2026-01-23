@@ -7,14 +7,16 @@
 */
 
 using System;
-using System.IO;
-using System.Configuration;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace ServerSide {
@@ -24,6 +26,10 @@ namespace ServerSide {
             public int maxByteSize;
 
         };
+
+
+
+   
     /*
     Method        : StartListener
     Description   : 
@@ -31,20 +37,18 @@ namespace ServerSide {
     Return Values : N/A
     */
     internal class ServerListener {
-
-        private int kMaxByteSize = 1024;
-        private int kMaxFileSize;
-
+        private CancellationTokenSource cts = new CancellationTokenSource(); 
         
-        internal void StartListener() {
+        internal async Task StartListener() {
+
             TcpListener server = null;
             string serverIP = ConfigurationManager.AppSettings["ServerIP"];
             string serverPortStr = ConfigurationManager.AppSettings["ServerPort"];
             string serverBufferSize = ConfigurationManager.AppSettings["BufferSize"];
-            int.TryParse(serverBufferSize, out kMaxByteSize);
+            int.TryParse(serverBufferSize, out int maxBufferSize);
             string serverMaxClients = ConfigurationManager.AppSettings["MaxClients"];
-            string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
-            int.TryParse(serverMaxFileSize, out kMaxFileSize);
+
+            CancellationToken token = cts.Token;
 
             try {
                 int port = 0;
@@ -56,26 +60,46 @@ namespace ServerSide {
 
                 server.Start();
 
-                while(true) {
+                
+                //Monitor monitor = new Monitor(token);
+                //Task fileMonitor = new Task(monitor.FileMonitor, token);
+                Task fileMonitor = new Task(FileMonitor, token); 
+                fileMonitor.Start();
+                TcpClient client = new TcpClient();
+
+                while (!cts.Token.IsCancellationRequested) {
 
                     // console writing used for debugging
                     Console.WriteLine("Waiting for connection...\n");
 
-                    TcpClient client = server.AcceptTcpClient();
+                    client = server.AcceptTcpClient();
 
                     // more dubigging console writes
                     Console.WriteLine("Connected!");
 
                     WorkerTasks tasks = new WorkerTasks();
                     tasks.client = client;
-                    tasks.maxByteSize = kMaxByteSize;
+                    tasks.maxByteSize = maxBufferSize;
 
+                    Reciever work = new Reciever(token);
+                    Task worker = new Task(work.WorkerTask, tasks, token);
+                    worker.Start();
 
-                    Worker work = new Worker();
-                    Task worker = new Task(work.WorkerTask, tasks);
-                    //Task.Run(() => .WorkerTask(client, kMaxByteSize));     // I don't understand tasks, clearly, couldn't get this to run without a lambda
                 }
-            } catch (Exception ex) {
+                fileMonitor.Wait();
+                //send kill command to clients
+                NetworkStream stream = client.GetStream();
+                byte[] byteData = Encoding.ASCII.GetBytes("Cancel Token");
+                stream.Write(byteData, 0, byteData.Length);
+
+
+                /*
+                 * make a list of all the CLIENTS an cyce throught hemwhen the kill token is ativated
+                 */
+
+
+            }
+            catch (Exception ex) {
                 Console.WriteLine(ex.Message);      // move to UI class when created
             } finally {
                 // stops the server as the final step of try/catch
@@ -88,39 +112,37 @@ namespace ServerSide {
 
 
         /*
-        Method        : Worker
+        Method        : file Monitor
         Description   : 
         Parameters    : Object task     :   the task object that is passed to the Worker
                                             in order to have it work independently
         Return Values : N/A
         */
-        //public void Worker(Object task){     // should probably give this a better name than "Worker"
-        //    // cast the object to a TcpClient object
-        //    TcpClient client = (TcpClient)task;
+        internal void FileMonitor() {
+            string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
+            int.TryParse(serverMaxFileSize, out int maxFileSize);
+            string serverFilePath = ConfigurationManager.AppSettings["FilePath"];
 
-        //    Byte[] bytes = new byte[kMaxByteSize];      // this can be changed, literally just a default value I'm using
-        //    string data = null;
+            //Continuously check the file size until stopRequested is true.
+            while (!cts.Token.IsCancellationRequested) {//replace with cancellaion token
+                try {
+                    long currentSize = new FileInfo(serverFilePath).Length;
+                    Console.Write("\n[Monitor] File size: {0}", currentSize);
 
-        //    NetworkStream stream = client.GetStream();
-
-        //    int i;
-
-        //    string filePath = ConfigurationManager.AppSettings["FilePath"];
-
-        //    // currently this is just receiving the client communication and not doing anything
-        //    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
-        //        data = Encoding.ASCII.GetString(bytes, 0, i);
-
-        //        // console write for debugging
-        //        Console.WriteLine("Received: {0}\n", data);
-
-        //        FileIO.FileWrite(filePath , data);
-        //    }
-
-        //    // sutdown and end connection
-        //    client.Close();
-
-        //    return;
-        //}
+                    //If maximum file size reached, stop all writer threads.
+                    if (currentSize >= maxFileSize) {
+                        Console.WriteLine("\nReached max file size — stopping writers...");
+                        cts.Cancel();
+                    } else {//time subject to change
+                        //Check file 10 times per second.
+                        Thread.Sleep(100);
+                    }
+                } catch (Exception ex) {
+                    //Handle case where file may not yet exist or is inaccessible.
+                    Console.WriteLine($"Monitor error: {ex.Message}");
+                }
+            }
+            return;
+        }
     }
 }

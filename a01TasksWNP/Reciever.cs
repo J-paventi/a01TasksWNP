@@ -11,8 +11,11 @@ namespace ServerSide {
     /// <summary>
     /// 
     /// </summary>
-    internal class Worker
-    {
+    internal class Reciever {
+        private readonly CancellationToken _Token;
+        public Reciever(CancellationToken token) {
+            _Token = token;
+        }
 
         /*
         Method        : Worker
@@ -21,8 +24,7 @@ namespace ServerSide {
                                             in order to have it work independently
         Return Values : N/A
         */
-        public void WorkerTask(Object task)
-        {     // should probably give this a better name than "Worker"
+        public void WorkerTask(Object task) {     // should probably give this a better name than "Worker"
 
             //WorkerTasks taskInfo = (WorkerTasks)task;
             if (task is WorkerTasks info) {
@@ -45,7 +47,7 @@ namespace ServerSide {
                 string filePath = ConfigurationManager.AppSettings["FilePath"];
 
                 // currently this is just receiving the client communication and not doing anything
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0 && !_Token.IsCancellationRequested) {
                     data = Encoding.ASCII.GetString(bytes, 0, i);
 
                     // console write for debugging

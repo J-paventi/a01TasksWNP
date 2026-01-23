@@ -18,6 +18,10 @@ namespace ClientSide {
     internal class Client {
         private TcpClient client;
         private NetworkStream stream;
+        private readonly CancellationToken _Token;
+        public Client (CancellationToken token){ 
+            _Token = token;
+        }
 
         /*
         Method        : Run
@@ -29,7 +33,7 @@ namespace ClientSide {
             Connect(); 
 
             int i = 0;
-            while (true) { //cancellation token.
+            while (!_Token.IsCancellationRequested) {
                 SendData(GenerateData());
 
                 //for debugging
@@ -66,6 +70,8 @@ namespace ClientSide {
         internal void SendData(string data) {
             byte[] byteData = Encoding.ASCII.GetBytes(data);
             stream.Write(byteData, 0, byteData.Length);
+
+            //maybe do syn ack
 
             return;
         }

@@ -21,7 +21,7 @@ namespace ServerSide {
         Parameters    : string msg      :   message to broadcast to clients.
         Return Values : N/A
         */
-        internal void Broadcast(string msg) {
+        internal void Broadcast(string msg, Stream client) {
             
         }
 
