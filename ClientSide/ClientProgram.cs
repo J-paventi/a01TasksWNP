@@ -19,17 +19,18 @@ using System.Threading.Tasks;
 namespace ClientSide {
     internal class ClientProgram {
         static void Main(string[] args) {
-            Client client = new Client();
-            client.Connect();
 
-            int i = 0;
-            while (true) { //cancellation token.
-                client.SendData(client.GenerateData());
+            //create token
 
-                //for debugging
-                i++;
-                if(i > 10) break;
-            }
+            //manage token in listener
+            ClientListener clientListener = new ClientListener();
+            Task listenTask = new Task(clientListener.StartListener);
+
+
+
+            Client clientSender = new Client();
+            Task sendTask = new Task(clientSender.Run);
+
         }
     }
 }

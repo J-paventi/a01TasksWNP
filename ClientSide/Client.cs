@@ -20,12 +20,29 @@ namespace ClientSide {
         private NetworkStream stream;
 
         /*
-        Method        : Connect
+        Method        : Run
         Description   : 
         Parameters    : N/A
         Return Values : N/A
         */
-        internal void Connect() { 
+        internal void Run() {
+
+            int i = 0;
+            while (true) { //cancellation token.
+                SendData(GenerateData());
+
+                //for debugging
+                i++;
+                if (i > 10) break;
+            }
+        }
+        /*
+       Method        : Connect
+       Description   : 
+       Parameters    : N/A
+       Return Values : N/A
+       */
+        internal void Connect() {
             //Retrieve & parse server ip & port from config.
             string serverIP = ConfigurationManager.AppSettings["ServerIP"];
             string serverPortStr = ConfigurationManager.AppSettings["ServerPort"];
