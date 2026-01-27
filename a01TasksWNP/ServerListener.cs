@@ -52,7 +52,7 @@ namespace ServerSide {
                 while (!ct.IsCancellationRequested) {
 
                     // console writing used for debugging
-                    Console.WriteLine("Waiting for connection...\n");
+                    Console.WriteLine("\nWaiting for connection...\n");
 
                     client = await server.AcceptTcpClientAsync();
                     
@@ -65,6 +65,7 @@ namespace ServerSide {
                         Reciever work = new Reciever(ct);
                         Task worker = work.WorkerTask(client, ct);
                     }
+
                 }
                 //send kill command to clients
                 //NetworkStream stream = client.GetStream();

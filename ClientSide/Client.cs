@@ -27,15 +27,27 @@ namespace ClientSide {
         */
         internal async Task Run(CancellationToken ct) {
             Connect(); 
+            
+            string serverBufferSize = ConfigurationManager.AppSettings["BufferSize"];
+            int.TryParse(serverBufferSize, out int maxBufferSize);
+            byte[] buffer = new byte[maxBufferSize];
 
-            int i = 0;
             while (!ct.IsCancellationRequested) {
                 SendData(GenerateData());
 
-                //for debugging
-                i++;
-                //if (i > 50) break;
+                if (stream.DataAvailable) {
+                    int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
+                    string msg = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
+                    if (msg.StartsWith("Cancel Token")) {
+                        ClientProgram.CancelToken();
+                    }
+                }
+
+                await Task.Delay(1, ct);
             }
+
+            return;
         }
         /*
        Method        : Connect
@@ -91,8 +103,8 @@ namespace ClientSide {
                 data += part; 
             }
             // for debugging
-            Console.WriteLine(data);
-            Console.WriteLine(max);
+            //Console.WriteLine(data);
+            //Console.WriteLine(max);
 
             return data;
         }

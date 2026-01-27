@@ -31,20 +31,21 @@ namespace ServerSide {
             int.TryParse(buffer, out int bufferSize);
 
             Byte[] bytes = new byte[bufferSize];      // this can be changed, literally just a default value I'm using
-            string data = null;
 
             NetworkStream stream = client.GetStream();
 
-            int i;
-
             string filePath = ConfigurationManager.AppSettings["FilePath"];
 
-            // currently this is just receiving the client communication and not doing anything
-            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0 && !ct.IsCancellationRequested) {
-                data = Encoding.ASCII.GetString(bytes, 0, i);
+            bool doneReading = false;
+
+            while (!doneReading && !ct.IsCancellationRequested) {
+                int i = await stream.ReadAsync(bytes, 0, bytes.Length, ct);
+                if (i == 0) doneReading = true;
+
+                string data = Encoding.ASCII.GetString(bytes, 0, i);
 
                 // console write for debugging
-                Console.WriteLine("Received: {0}\n", data);
+                //Console.WriteLine("Received: {0}\n", data);
 
                 FileIO.FileWrite(filePath, data);
             }
