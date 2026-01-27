@@ -17,7 +17,7 @@ namespace ClientSide
             _Token = token;
         }
 
-        internal void StartListener() {
+        internal async Task StartListener(CancellationToken ct) {
             TcpListener client = null;
             try {
                 string serverIP = ConfigurationManager.AppSettings["ServerIP"];
@@ -33,7 +33,7 @@ namespace ClientSide
 
                 Byte[] bytes = new byte[64]; 
 
-                while (!_Token.IsCancellationRequested) {
+                while (!ct.IsCancellationRequested) {
 
                     // console writing used for debugging
                     Console.WriteLine("Waiting for connection...\n");

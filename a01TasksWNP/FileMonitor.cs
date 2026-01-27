@@ -5,15 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using a01TasksWNP;
 
 namespace ServerSide {
-    internal class Monitor {
+    internal class FileMonitor {
         private readonly CancellationToken _Token;
-        public Monitor(CancellationToken token) {
+        public FileMonitor(CancellationToken token) {
             _Token = token;
         }
 
-        internal void FileMonitor() {
+        internal async Task Monitor(CancellationToken ct) {
             string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
             int.TryParse(serverMaxFileSize, out int maxFileSize);
             string serverFilePath = ConfigurationManager.AppSettings["FilePath"];
@@ -27,7 +28,7 @@ namespace ServerSide {
             FileIO.VerifyFileExists(serverFilePath);
 
             //Continuously check the file size until stopRequested is true.
-            while (!_Token.IsCancellationRequested) {//replace with cancellaion token
+            while (!ct.IsCancellationRequested) {//replace with cancellaion token
                 try {
                     long currentSize = new FileInfo(serverFilePath).Length;
                     Console.Write("\n[Monitor] File size: {0}", currentSize);
@@ -35,7 +36,7 @@ namespace ServerSide {
                     //If maximum file size reached, stop all writer threads.
                     if (currentSize >= maxFileSize) {
                         Console.WriteLine("\nReached max file size — stopping writers...");
-                        ServerListener.CancelToken();
+                        ServerProgram.CancelToken();
                     } else {//time subject to change
                         //Check file 10 times per second.
                         Thread.Sleep(100);

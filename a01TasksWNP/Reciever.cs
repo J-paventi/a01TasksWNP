@@ -24,35 +24,34 @@ namespace ServerSide {
                                             in order to have it work independently
         Return Values : N/A
         */
-        public void WorkerTask(Object task) {     // should probably give this a better name than "Worker"
+        internal async Task WorkerTask(TcpClient client, CancellationToken ct) {     // should probably give this a better name than "Worker"
 
             //WorkerTasks taskInfo = (WorkerTasks)task;
-            if (task is TcpClient client) {
-                string buffer = ConfigurationManager.AppSettings["BufferSize"];
-                int.TryParse(buffer, out int bufferSize);
+            string buffer = ConfigurationManager.AppSettings["BufferSize"];
+            int.TryParse(buffer, out int bufferSize);
 
-                Byte[] bytes = new byte[bufferSize];      // this can be changed, literally just a default value I'm using
-                string data = null;
+            Byte[] bytes = new byte[bufferSize];      // this can be changed, literally just a default value I'm using
+            string data = null;
 
-                NetworkStream stream = client.GetStream();
+            NetworkStream stream = client.GetStream();
 
-                int i;
+            int i;
 
-                string filePath = ConfigurationManager.AppSettings["FilePath"];
+            string filePath = ConfigurationManager.AppSettings["FilePath"];
 
-                // currently this is just receiving the client communication and not doing anything
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0 && !_Token.IsCancellationRequested) {
-                    data = Encoding.ASCII.GetString(bytes, 0, i);
+            // currently this is just receiving the client communication and not doing anything
+            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0 && !ct.IsCancellationRequested) {
+                data = Encoding.ASCII.GetString(bytes, 0, i);
 
-                    // console write for debugging
-                    Console.WriteLine("Received: {0}\n", data);
+                // console write for debugging
+                Console.WriteLine("Received: {0}\n", data);
 
-                    FileIO.FileWrite(filePath, data);
-                }
-
-                // sutdown and end connection
-                client.Close();
+                FileIO.FileWrite(filePath, data);
             }
+
+            // sutdown and end connection
+            client.Close();
+
             return;
         }
     }

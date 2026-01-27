@@ -27,10 +27,8 @@ namespace ServerSide {
     Return Values : N/A
     */
     internal class ServerListener {
-        private static List<TcpClient> clients = new List<TcpClient>();
-        private static CancellationTokenSource cts = new CancellationTokenSource(); 
         
-        internal async Task StartListener() {
+        internal async Task StartListener(CancellationToken ct, List<TcpClient> clients) {
 
             TcpListener server = null;
             string serverIP = ConfigurationManager.AppSettings["ServerIP"];
@@ -38,8 +36,6 @@ namespace ServerSide {
             string serverBufferSize = ConfigurationManager.AppSettings["BufferSize"];
             int.TryParse(serverBufferSize, out int maxBufferSize);
             string serverMaxClients = ConfigurationManager.AppSettings["MaxClients"];
-
-            CancellationToken token = cts.Token;
 
             try {
                 int port = 0;
@@ -51,32 +47,25 @@ namespace ServerSide {
 
                 server.Start();
 
-                
-                Monitor monitor = new Monitor(token);
-                Task fileMonitor = new Task(monitor.FileMonitor, token);
-                //Task fileMonitor = new Task(FileMonitor, token); 
-                fileMonitor.Start();
                 TcpClient client = new TcpClient();
 
-                while (!cts.Token.IsCancellationRequested) {
+                while (!ct.IsCancellationRequested) {
 
                     // console writing used for debugging
                     Console.WriteLine("Waiting for connection...\n");
 
-                    client = server.AcceptTcpClient();
+                    client = await server.AcceptTcpClientAsync();
                     
-                    if (!cts.Token.IsCancellationRequested){ 
+                    if (!ct.IsCancellationRequested){ 
                         // more dubigging console writes
                         Console.WriteLine("Connected!");
 
                         clients.Add(client);
 
-                        Reciever work = new Reciever(token);
-                        Task worker = new Task(work.WorkerTask, client, token);
-                        worker.Start();
+                        Reciever work = new Reciever(ct);
+                        Task worker = work.WorkerTask(client, ct);
                     }
                 }
-                fileMonitor.Wait();
                 //send kill command to clients
                 //NetworkStream stream = client.GetStream();
                 //byte[] byteData = Encoding.ASCII.GetBytes("Cancel Token");
@@ -87,8 +76,7 @@ namespace ServerSide {
 
 
 
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Console.WriteLine(ex.Message);      // move to UI class when created
             } finally {
                 // stops the server as the final step of try/catch
@@ -98,9 +86,5 @@ namespace ServerSide {
             return;
         }
 
-        internal static void CancelToken(){ 
-            UI.Broadcast("Cancel Token", clients);
-            cts.Cancel();
-        }
     }
 }

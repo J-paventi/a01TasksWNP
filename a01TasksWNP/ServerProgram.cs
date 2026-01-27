@@ -17,10 +17,26 @@ using ServerSide;
 
 namespace a01TasksWNP {
     internal class ServerProgram {
-        static void Main(string[] args) {
+        private static List<TcpClient> clients = new List<TcpClient>();
+        private static CancellationTokenSource cts = new CancellationTokenSource(); 
+
+        static async Task Main(string[] args) {
+            CancellationToken token = cts.Token;
+
             // Create listener for a client request and start the listener
             ServerListener listener = new ServerListener();
-            listener.StartListener();
+            Task serverListener = listener.StartListener(token, clients);
+
+            FileMonitor monitor = new FileMonitor(token);
+            Task fileMonitor = monitor.Monitor(token);
+            //Task fileMonitor = new Task(FileMonitor, token); 
+
+            await Task.WhenAll(serverListener, fileMonitor);
+        }
+        
+        internal static void CancelToken(){ 
+            UI.Broadcast("Cancel Token", clients);
+            cts.Cancel();
         }
     }
 }

@@ -26,14 +26,14 @@ namespace ClientSide {
             CancellationToken token = cts.Token;
 
             ClientListener clientListener = new ClientListener(token);
-            Task listenTask = new Task(clientListener.StartListener, token);
+            Task listenTask = clientListener.StartListener(token);
             //Task listenTask = new Task(StartListener, token);
 
 
-            Client clientSender = new Client(token);
-            Task sendTask = new Task(clientSender.Run);
-            sendTask.Start();
-            sendTask.Wait();
+            Client clientSender = new Client();
+            Task sendTask = clientSender.Run(token);
+
+            await Task.WhenAll(listenTask, sendTask);
         }
         
         internal static void CancelToken(){ 
