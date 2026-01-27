@@ -1,43 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ServerSide {
-//    internal class Monitor {
-//        private readonly CancellationToken _Token;
-//        public Monitor (CancellationToken token){ 
-//            _Token = token;
-//        }
+    internal class Monitor {
+        private readonly CancellationToken _Token;
+        public Monitor(CancellationToken token) {
+            _Token = token;
+        }
 
-//        internal void FileMonitor() {
-//            string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
-//            int.TryParse(serverMaxFileSize, out int maxFileSize);
-//            string serverFilePath = ConfigurationManager.AppSettings["FilePath"];
+        internal void FileMonitor() {
+            string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
+            int.TryParse(serverMaxFileSize, out int maxFileSize);
+            string serverFilePath = ConfigurationManager.AppSettings["FilePath"];
+            
 
-//            bool fileGood = true;
-//            //Continuously check the file size until stopRequested is true.
-//            while (fileGood){//replace with cancellaion token
-//                try{
-//                    long currentSize = new FileInfo(serverFilePath).Length;
-//                    Console.Write("\n[Monitor] File size: {0}", currentSize);
+            //Purely for debugging.
+            File.Delete(serverFilePath);
 
-//                    //If maximum file size reached, stop all writer threads.
-//                    if (currentSize >= maxFileSize){
-//                        Console.WriteLine("\nReached max file size — stopping writers...");
-//                        fileGood = false;
-//                    } else {//time subject to change
-//                        //Check file 10 times per second.
-//                        Thread.Sleep(100);
-//                    }
-//                } catch (Exception ex){
-//                    //Handle case where file may not yet exist or is inaccessible.
-//                    Console.WriteLine($"Monitor error: {ex.Message}");
-//                }
-//            }
-//            return;
-//        }
-//    }
+
+
+            FileIO.VerifyFileExists(serverFilePath);
+
+            //Continuously check the file size until stopRequested is true.
+            while (!_Token.IsCancellationRequested) {//replace with cancellaion token
+                try {
+                    long currentSize = new FileInfo(serverFilePath).Length;
+                    Console.Write("\n[Monitor] File size: {0}", currentSize);
+
+                    //If maximum file size reached, stop all writer threads.
+                    if (currentSize >= maxFileSize) {
+                        Console.WriteLine("\nReached max file size — stopping writers...");
+                        ServerListener.CancelToken();
+                    } else {//time subject to change
+                        //Check file 10 times per second.
+                        Thread.Sleep(100);
+                    }
+                } catch (Exception ex) {
+                    //Handle case where file may not yet exist or is inaccessible.
+                    Console.WriteLine($"Monitor error: {ex.Message}");
+                }
+            }
+            return;
+        }
+    }
 }

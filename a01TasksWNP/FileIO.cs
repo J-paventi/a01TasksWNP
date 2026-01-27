@@ -41,7 +41,7 @@ namespace ServerSide {
 
             return;
         }
-
+        
         /*
         Method        : FileGetSize
         Description   : 
@@ -50,6 +50,27 @@ namespace ServerSide {
         */
         internal static long FileGetSize(string path){ 
             return new FileInfo(path).Length;
+        }
+        
+        /*
+        Method        : VerifyFileExists
+        Description   : 
+        Parameters    : string path     :   path of file to get size of.
+        Return Values : bool            :   returns a long with the current size of the file
+        */
+        internal static bool VerifyFileExists(string path){
+            bool fileResult = false;
+            try {
+                if (!File.Exists(path)){
+                    File.Create(path).Dispose();
+                } 
+                fileResult = true;
+            } catch (Exception e){
+                Logger.LogMessage("Exception occured while creating file: " + e.Message);
+                fileResult = false;
+            }
+
+            return fileResult;
         }
     }
 }

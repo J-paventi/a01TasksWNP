@@ -27,17 +27,11 @@ namespace ServerSide {
         public void WorkerTask(Object task) {     // should probably give this a better name than "Worker"
 
             //WorkerTasks taskInfo = (WorkerTasks)task;
-            if (task is WorkerTasks info) {
+            if (task is TcpClient client) {
+                string buffer = ConfigurationManager.AppSettings["BufferSize"];
+                int.TryParse(buffer, out int bufferSize);
 
-
-
-                //cast MaxByteSize to int
-                int mByteSize = info.maxByteSize;
-
-                // cast the object to a TcpClient object
-                TcpClient client = info.client;
-
-                Byte[] bytes = new byte[mByteSize];      // this can be changed, literally just a default value I'm using
+                Byte[] bytes = new byte[bufferSize];      // this can be changed, literally just a default value I'm using
                 string data = null;
 
                 NetworkStream stream = client.GetStream();
