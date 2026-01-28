@@ -26,24 +26,32 @@ namespace ClientSide {
         Return Values : N/A
         */
         internal async Task Run(CancellationToken ct) {
-            Connect(); 
+            //Connect(); 
             
             string serverBufferSize = ConfigurationManager.AppSettings["BufferSize"];
             int.TryParse(serverBufferSize, out int maxBufferSize);
             byte[] buffer = new byte[maxBufferSize];
 
             while (!ct.IsCancellationRequested) {
-                SendData(GenerateData());
+                try{
+                    Connect(); 
+            
+                    SendData(GenerateData());
 
-                if (stream.DataAvailable) {
-                    int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
-                    string msg = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    if (stream.DataAvailable) {
+                        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
+                        string msg = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
-                    if (msg.StartsWith("Cancel Token")) {
-                        ClientProgram.CancelToken();
+                        if (msg.StartsWith("Cancel Token")) {
+                            ClientProgram.CancelToken();
+                        }
                     }
+                    
+                    Disconnect();
+                } catch {
+                    //Server is closed. clients should stop.
+                    ClientProgram.CancelToken();
                 }
-
                 await Task.Delay(1, ct);
             }
 
@@ -62,9 +70,28 @@ namespace ClientSide {
             int serverPort = 0;
             int.TryParse(serverPortStr, out serverPort);
 
-            //Establist connection to server.
-            client = new TcpClient(serverIP, serverPort);
-            stream = client.GetStream();
+            try {
+                //Establist connection to server.
+                client = new TcpClient(serverIP, serverPort);
+                stream = client.GetStream();
+            } catch {
+                //Server is closed. clients should stop.
+                ClientProgram.CancelToken();
+            }
+
+            return;
+        }
+        /*
+       Method        : Disconnect
+       Description   : 
+       Parameters    : N/A
+       Return Values : N/A
+       */
+        internal void Disconnect() {
+            stream.Close();
+            client.Close();
+            stream = null;
+            client = null;
 
             return;
         }
@@ -76,13 +103,17 @@ namespace ClientSide {
         Return Values : N/A
         */
         internal void SendData(string data) {
-            try {
-                byte[] byteData = Encoding.ASCII.GetBytes(data);
-                stream.Write(byteData, 0, byteData.Length);
-            } catch { 
-                ClientProgram.CancelToken();
+            bool canSend = !(client == null || stream == null);
+
+            if (canSend) {
+                try {
+                    byte[] byteData = Encoding.ASCII.GetBytes(data);
+                    stream.Write(byteData, 0, byteData.Length);
+                } catch { 
+                    ClientProgram.CancelToken();
+                }
+                //maybe do syn ack
             }
-            //maybe do syn ack
 
             return;
         }

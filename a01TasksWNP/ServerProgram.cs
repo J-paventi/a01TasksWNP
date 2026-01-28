@@ -27,7 +27,7 @@ namespace a01TasksWNP {
             ServerListener listener = new ServerListener();
             Task serverListener = listener.StartListener(token, clients);
 
-            FileMonitor monitor = new FileMonitor(token);
+            FileMonitor monitor = new FileMonitor();
             Task fileMonitor = monitor.Monitor(token);
             //Task fileMonitor = new Task(FileMonitor, token); 
 
@@ -36,6 +36,10 @@ namespace a01TasksWNP {
         
         internal static void CancelToken(){ 
             UI.Broadcast("Cancel Token", clients);
+
+            foreach (TcpClient client in clients) client.Close();
+            clients.Clear();
+
             cts.Cancel();
         }
     }

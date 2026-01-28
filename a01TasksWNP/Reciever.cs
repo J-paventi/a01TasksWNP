@@ -12,11 +12,6 @@ namespace ServerSide {
     /// 
     /// </summary>
     internal class Reciever {
-        private readonly CancellationToken _Token;
-        public Reciever(CancellationToken token) {
-            _Token = token;
-        }
-
         /*
         Method        : Worker
         Description   : 
@@ -51,7 +46,7 @@ namespace ServerSide {
             }
 
             // sutdown and end connection
-            client.Close();
+            //client.Close();
 
             return;
         }

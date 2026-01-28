@@ -62,21 +62,11 @@ namespace ServerSide {
 
                         clients.Add(client);
 
-                        Reciever work = new Reciever(ct);
+                        Reciever work = new Reciever();
                         Task worker = work.WorkerTask(client, ct);
                     }
 
                 }
-                //send kill command to clients
-                //NetworkStream stream = client.GetStream();
-                //byte[] byteData = Encoding.ASCII.GetBytes("Cancel Token");
-                //stream.Write(byteData, 0, byteData.Length);
-
-                
-                //UI.Broadcast("Cancel Token", clients);
-
-
-
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);      // move to UI class when created
             } finally {

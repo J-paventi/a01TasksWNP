@@ -10,13 +10,6 @@ using System.Threading.Tasks;
 namespace ClientSide
 {
     internal class ClientListener {
-        private int kMaxByteSize = 1024;
-        private int kMaxFileSize;
-        private readonly CancellationToken _Token;
-        public ClientListener (CancellationToken token){ 
-            _Token = token;
-        }
-
         internal async Task StartListener(CancellationToken ct) {
             TcpListener client = null;
             try {

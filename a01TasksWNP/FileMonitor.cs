@@ -9,11 +9,6 @@ using a01TasksWNP;
 
 namespace ServerSide {
     internal class FileMonitor {
-        private readonly CancellationToken _Token;
-        public FileMonitor(CancellationToken token) {
-            _Token = token;
-        }
-
         internal async Task Monitor(CancellationToken ct) {
             string serverMaxFileSize = ConfigurationManager.AppSettings["MaxFileSize"];
             int.TryParse(serverMaxFileSize, out int maxFileSize);
@@ -28,7 +23,7 @@ namespace ServerSide {
             FileIO.VerifyFileExists(serverFilePath);
 
             //Continuously check the file size until stopRequested is true.
-            while (!ct.IsCancellationRequested) {//replace with cancellaion token
+            while (!ct.IsCancellationRequested) {
                 try {
                     long currentSize = new FileInfo(serverFilePath).Length;
                     Console.Write("\n[Monitor] File size: {0}", currentSize);
