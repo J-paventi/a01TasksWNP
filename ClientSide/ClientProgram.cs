@@ -6,17 +6,7 @@
 *   DESCRIPTION     :   
 */
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace ClientSide {
@@ -42,6 +32,7 @@ namespace ClientSide {
             try {
                 await Task.WhenAll(clientTasks);
             } catch (OperationCanceledException) {
+                CancelToken();
                 Console.WriteLine("All clients stopped.");
             }
         }

@@ -38,18 +38,19 @@ namespace ClientSide {
             
                     SendData(GenerateData());
 
-                    if (stream.DataAvailable) {
+                    /*if (stream.DataAvailable) {
                         int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
                         string msg = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
                         if (msg.StartsWith("Cancel Token")) {
                             ClientProgram.CancelToken();
                         }
-                    }
+                    }*/
                     
                     Disconnect();
-                } catch {
+                } catch (Exception e){
                     //Server is closed. clients should stop.
+                    Console.WriteLine("Client Run Error: {0}", e.Message);
                     ClientProgram.CancelToken();
                 }
                 await Task.Delay(1, ct);
@@ -74,8 +75,9 @@ namespace ClientSide {
                 //Establist connection to server.
                 client = new TcpClient(serverIP, serverPort);
                 stream = client.GetStream();
-            } catch {
+            } catch (Exception e){
                 //Server is closed. clients should stop.
+                Console.WriteLine("Client Connect Error: {0}", e.Message);
                 ClientProgram.CancelToken();
             }
 
