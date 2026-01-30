@@ -52,13 +52,13 @@ namespace ServerSide {
                 while (!ct.IsCancellationRequested) {
 
                     // console writing used for debugging
-                    Console.WriteLine("\nWaiting for connection...\n");
+                    //Console.WriteLine("\nWaiting for connection...\n");
 
                     client = await server.AcceptTcpClientAsync();
                     
                     if (!ct.IsCancellationRequested){ 
                         // more dubigging console writes
-                        Console.WriteLine("Connected!");
+                        //Console.WriteLine("Connected!");
 
                         clients.Add(client);
 

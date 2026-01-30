@@ -25,21 +25,28 @@ namespace ServerSide {
         */
         internal static void Broadcast(string msg, List<TcpClient> clients) {
             byte[] byteData = Encoding.ASCII.GetBytes(msg);
-            
+
             //foreach (TcpClient client in clients) {
             //    client.GetStream().Write(byteData, 0, byteData.Length);
             //}
-            for (int i = clients.Count - 1; i >= 0; i--) {
+            for (int i = clients.Count - 1; i >= 0; i--)
+            {
                 TcpClient client = clients[i];
 
-                try {
-                    if (client.Connected) {
+                try
+                {
+                    if (client.Connected)
+                    {
                         NetworkStream stream = client.GetStream();
                         stream.Write(byteData, 0, byteData.Length);
-                    } else {
+                    }
+                    else
+                    {
                         clients.RemoveAt(i);
                     }
-                } catch {
+                }
+                catch
+                {
                     //dead client, remove it.
                     clients.RemoveAt(i);
                 }

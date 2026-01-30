@@ -37,7 +37,6 @@ namespace a01TasksWNP {
         internal static void CancelToken(){ 
             UI.Broadcast("Cancel Token", clients);
 
-            foreach (TcpClient client in clients) client.Close();
             clients.Clear();
 
             cts.Cancel();

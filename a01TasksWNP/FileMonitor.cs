@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,13 +15,13 @@ namespace ServerSide {
             int.TryParse(serverMaxFileSize, out int maxFileSize);
             string serverFilePath = ConfigurationManager.AppSettings["FilePath"];
             
-
             //Purely for debugging.
             File.Delete(serverFilePath);
 
-
-
             FileIO.VerifyFileExists(serverFilePath);
+
+            Stopwatch elapsedTime = new Stopwatch();
+            elapsedTime.Start();
 
             //Continuously check the file size until stopRequested is true.
             while (!ct.IsCancellationRequested) {
@@ -41,6 +42,9 @@ namespace ServerSide {
                     Console.WriteLine($"Monitor error: {ex.Message}");
                 }
             }
+            elapsedTime.Stop();
+            Logger.LogMessage($"Elapsed Time to Wirte File: {elapsedTime}");
+
             return;
         }
     }

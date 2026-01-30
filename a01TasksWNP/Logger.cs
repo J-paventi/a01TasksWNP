@@ -18,7 +18,7 @@ namespace ServerSide {
         Return Values : N/A
         */
         public static void LogMessage(string message) {
-            string logPath = ConfigurationManager.AppSettings["serverLog.log"];
+            string logPath = ConfigurationManager.AppSettings["LogFile"];
 
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string line = timestamp + " - " + message + "\n";
