@@ -2,23 +2,21 @@
 *	FILE	        :   UI.cs
 *	PROJECT         :   A01 Tasks - Windows Network Programming
 *   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
-*   FIRST VERSION   :   
-*   DESCRIPTION     :   
+*   FIRST VERSION   :   January 31, 2026
+*   DESCRIPTION     :   This is the file responsible for communicating any issues
+*                       to the console or to the connected clients.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerSide {
     internal class UI {
 
         /*
         Method        : Broadcast
-        Description   : 
+        Description   : The method will broadcast to any connected client any messages the
+                        server needs to send to the clients.
         Parameters    : string msg      :   message to broadcast to clients.
                        
         Return Values : N/A
@@ -26,9 +24,6 @@ namespace ServerSide {
         internal static void Broadcast(string msg, List<TcpClient> clients) {
             byte[] byteData = Encoding.ASCII.GetBytes(msg);
 
-            //foreach (TcpClient client in clients) {
-            //    client.GetStream().Write(byteData, 0, byteData.Length);
-            //}
             for (int i = clients.Count - 1; i >= 0; i--)
             {
                 TcpClient client = clients[i];
@@ -57,7 +52,8 @@ namespace ServerSide {
 
         /*
         Method        : DisplayMessage
-        Description   : 
+        Description   : This will display any message that may be pertinent to the
+                        server.
         Parameters    : string msg      :   message to display to user
         Return Values : N/A
         */

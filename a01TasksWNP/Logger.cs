@@ -2,8 +2,8 @@
 *	FILE	        :   Logger.cs
 *	PROJECT         :   A01 Tasks - Windows Network Programming
 *   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
-*   FIRST VERSION   :   
-*   DESCRIPTION     :   
+*   FIRST VERSION   :   January 31, 2026
+*   DESCRIPTION     :   This file logs any data sent to it by the server.
 */
 
 using System.Configuration;

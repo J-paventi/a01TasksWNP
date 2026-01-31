@@ -2,8 +2,10 @@
 *	FILE	        :   FileIO.cs
 *	PROJECT         :   A01 Tasks - Windows Network Programming
 *   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
-*   FIRST VERSION   :   
-*   DESCRIPTION     :   
+*   FIRST VERSION   :   January 31, 2026
+*   DESCRIPTION     :   This file is responsible for all of the server's
+*                       file operations. It controls the reading and writing
+*                       operations.
 */
 
 namespace ServerSide {

@@ -1,5 +1,5 @@
 ﻿/*
-*	FILE	        :   ClientProgram.cs
+*	FILE	        :   UI.cs
 *	PROJECT         :   A01 Tasks - Windows Network Programming
 *   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
 *   FIRST VERSION   :   January 31, 2026

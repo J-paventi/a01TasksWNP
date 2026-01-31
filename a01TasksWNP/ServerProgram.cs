@@ -1,9 +1,12 @@
 ﻿/*
-*	FILE	        :   a01TasksWNP.cs
+*	FILE	        :   ServerProgram.cs
 *	PROJECT         :   A01 Tasks - Windows Network Programming
 *   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
-*   FIRST VERSION   :   
-*   DESCRIPTION     :   
+*   FIRST VERSION   :   January 31, 2026
+*   DESCRIPTION     :   This file contains all the logic for the server to
+*                       run. It creates the tasks the server will use and
+*                       controls the method to kill the tasks the server has
+*                       created.
 */
 
 using System.Net.Sockets;
@@ -23,11 +26,17 @@ namespace a01TasksWNP {
 
             FileMonitor monitor = new FileMonitor();
             Task fileMonitor = monitor.Monitor(token);
-            //Task fileMonitor = new Task(FileMonitor, token); 
 
             await Task.WhenAll(serverListener, fileMonitor);
         }
-        
+
+        /*
+        Method        : CancelToken
+        Description   : This method cancels the cancellation token
+                        thereby killing all of the server's tasks
+        Parameters    : N/A
+        Return Values : N/A
+        */
         internal static void CancelToken(){ 
             UI.Broadcast("Cancel Token", clients);
 
