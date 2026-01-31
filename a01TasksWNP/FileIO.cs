@@ -6,17 +6,6 @@
 *   DESCRIPTION     :   
 */
 
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace ServerSide {
     internal class FileIO {
         private static readonly object locker = new object();
@@ -35,7 +24,7 @@ namespace ServerSide {
                         sw.Write(data);
                     } 
                 } catch (Exception ex) { 
-                    Console.WriteLine(ex.ToString());
+                    UI.DisplayMessage(ex.ToString());
                 }
             }
 

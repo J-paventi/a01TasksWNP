@@ -6,13 +6,9 @@
 *   DESCRIPTION     :   
 */
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ClientSide {
     internal class Client {
@@ -26,35 +22,35 @@ namespace ClientSide {
         Return Values : N/A
         */
         internal async Task Run(CancellationToken ct) {
-            //Connect(); 
-            
             string serverBufferSize = ConfigurationManager.AppSettings["BufferSize"];
             int.TryParse(serverBufferSize, out int maxBufferSize);
             byte[] buffer = new byte[maxBufferSize];
 
             while (!ct.IsCancellationRequested) {
                 try{
-                    Connect(); 
-            
-                    SendData(GenerateData());
+                    if(Connect()) { 
+                        SendData(GenerateData());
 
-                    /*if (stream.DataAvailable) {
-                        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
-                        string msg = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                        /*if (stream.DataAvailable) {
+                            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, ct);
+                            string msg = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
-                        if (msg.StartsWith("Cancel Token")) {
-                            ClientProgram.CancelToken();
-                        }
-                    }*/
+                            if (msg.StartsWith("Cancel Token")) {
+                                ClientProgram.CancelToken();
+                            }
+                        }*/
                     
-                    Disconnect();
+                        Disconnect();
+                        await Task.Delay(50);
+                    } else {
+                        await Task.Delay(10000);
+                    }
                 } catch (Exception e){
-                    //Server is closed. clients should stop.
-                    Console.WriteLine("Client Run Error: {0}", e.Message);
-                    ClientProgram.CancelToken();
+                        //Server is closed. clients should stop.
+                        UI.DisplayMessage($"Client Run Error: {e}");
+                        ClientProgram.CancelToken();
+                    }
                 }
-                await Task.Delay(1, ct);
-            }
 
             return;
         }
@@ -64,7 +60,8 @@ namespace ClientSide {
        Parameters    : N/A
        Return Values : N/A
        */
-        internal void Connect() {
+        internal bool Connect() {
+            bool result = false;
             //Retrieve & parse server ip & port from config.
             string serverIP = ConfigurationManager.AppSettings["ServerIP"];
             string serverPortStr = ConfigurationManager.AppSettings["ServerPort"];
@@ -75,13 +72,33 @@ namespace ClientSide {
                 //Establist connection to server.
                 client = new TcpClient(serverIP, serverPort);
                 stream = client.GetStream();
+                result = true;
+            } catch (SocketException ex) {
+                    Disconnect();
+
+                    bool handled = false;
+                    if (ex.SocketErrorCode == SocketError.AddressAlreadyInUse) {
+                        UI.DisplayMessage("Port exhaustion detected - delaying 10 seconds...");
+                        handled = true;
+                    }
+
+                    if (!handled && ex.SocketErrorCode == SocketError.ConnectionRefused) {
+                        UI.DisplayMessage("Server refused connection - cancelling client.");
+                        ClientProgram.CancelToken();
+                        handled = true;
+                    }
+
+                    if (!handled) {
+                        UI.DisplayMessage($"Client Run: Unhandled socket error: {ex.SocketErrorCode}");
+                        ClientProgram.CancelToken();
+                    }
             } catch (Exception e){
-                //Server is closed. clients should stop.
-                Console.WriteLine("Client Connect Error: {0}", e.Message);
+                UI.DisplayMessage($"Client Connect Error: {e}");
+                result = false;
                 ClientProgram.CancelToken();
             }
 
-            return;
+            return result;
         }
         /*
        Method        : Disconnect
@@ -90,14 +107,21 @@ namespace ClientSide {
        Return Values : N/A
        */
         internal void Disconnect() {
-            stream.Close();
-            client.Close();
+            try {
+                stream?.Close();
+                stream?.Dispose();
+            } catch {}
+
+            try {
+                client?.Close();
+                client?.Dispose();
+            } catch {}
+
             stream = null;
             client = null;
 
             return;
         }
-
         /*
         Method        : SendData
         Description   : 
@@ -126,7 +150,7 @@ namespace ClientSide {
         Parameters    : N/A  
         Return Values : string          :   
         */
-        internal string GenerateData(){ 
+        internal string GenerateData(){
             Random numberOfGUIDS = new Random();
             int max = numberOfGUIDS.Next(1, 101);
             string data = string.Empty;
@@ -136,8 +160,8 @@ namespace ClientSide {
                 data += part; 
             }
             // for debugging
-            //Console.WriteLine(data);
-            //Console.WriteLine(max);
+            //UI.DisplayMessage(data);
+            //UI.DisplayMessage(max);
 
             return data;
         }

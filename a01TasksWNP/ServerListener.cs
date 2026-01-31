@@ -6,17 +6,9 @@
 *   DESCRIPTION     :   
 */
 
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace ServerSide {
@@ -52,13 +44,13 @@ namespace ServerSide {
                 while (!ct.IsCancellationRequested) {
 
                     // console writing used for debugging
-                    //Console.WriteLine("\nWaiting for connection...\n");
+                    //UI.DisplayMessage("\nWaiting for connection...\n");
 
                     client = await server.AcceptTcpClientAsync();
                     
                     if (!ct.IsCancellationRequested){ 
                         // more dubigging console writes
-                        //Console.WriteLine("Connected!");
+                        //UI.DisplayMessage("Connected!");
 
                         clients.Add(client);
 
@@ -68,7 +60,7 @@ namespace ServerSide {
 
                 }
             } catch (Exception ex) {
-                Console.WriteLine(ex.Message);      // move to UI class when created
+                UI.DisplayMessage(ex.Message);      // move to UI class when created
             } finally {
                 // stops the server as the final step of try/catch
                 server.Stop();

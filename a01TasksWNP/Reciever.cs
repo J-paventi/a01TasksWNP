@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
+﻿using System.Configuration;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerSide {
 
@@ -40,13 +36,14 @@ namespace ServerSide {
                 string data = Encoding.ASCII.GetString(bytes, 0, i);
 
                 // console write for debugging
-                //Console.WriteLine("Received: {0}\n", data);
+                //UI.DisplayMessage("Received: {0}\n", data);
 
                 FileIO.FileWrite(filePath, data);
             }
 
             // sutdown and end connection
             //client.Close();
+            //client.Dispose();
 
             return;
         }

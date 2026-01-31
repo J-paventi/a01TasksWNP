@@ -33,7 +33,7 @@ namespace ClientSide {
                 await Task.WhenAll(clientTasks);
             } catch (OperationCanceledException) {
                 CancelToken();
-                Console.WriteLine("All clients stopped.");
+                UI.DisplayMessage("All clients stopped.");
             }
         }
         
