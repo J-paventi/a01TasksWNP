@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+*	FILE	        :   ClientProgram.cs
+*	PROJECT         :   A01 Tasks - Windows Network Programming
+*   PROGRAMMER      :   Jonathan Paventi, Josh Visentin, and Trent Beitz
+*   FIRST VERSION   :   January 31, 2026
+*   DESCRIPTION     :   A class that is responsible for printing any messages
+*                       to the screen. 
+*/
 
 namespace ClientSide {
     internal class UI {
