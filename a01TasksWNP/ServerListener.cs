@@ -67,6 +67,7 @@ namespace ServerSide {
                 }
             } catch (Exception ex) {
                 UI.DisplayMessage(ex.Message);      // move to UI class when created
+                Logger.LogMessage($"{ex.Message}");
             } finally {
                 // stops the server as the final step of try/catch
                 server.Stop();

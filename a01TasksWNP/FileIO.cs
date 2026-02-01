@@ -27,6 +27,7 @@ namespace ServerSide {
                     } 
                 } catch (Exception ex) { 
                     UI.DisplayMessage(ex.ToString());
+                    Logger.LogMessage($"{ex.Message}");
                 }
             }
 

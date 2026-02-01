@@ -65,6 +65,7 @@ namespace ServerSide {
                 } catch (Exception ex) {
                     //Handle case where file may not yet exist or is inaccessible.
                     UI.DisplayMessage($"Monitor error: {ex.Message}");
+                    Logger.LogMessage($"{ex.Message}");
                 }
             }
             // end stopwatch time when file reaches max and log it
