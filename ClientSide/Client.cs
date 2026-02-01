@@ -93,7 +93,7 @@ namespace ClientSide {
 
                     // if the connection with the server has been closed, this error occurs
                     if (!handled && ex.SocketErrorCode == SocketError.ConnectionRefused) {
-                        UI.DisplayMessage("Server refused connection - cancelling client.");
+                        UI.DisplayMessage("Server shutdown or refused connection - cancelling client.");
                         ClientProgram.CancelToken();
                         handled = true;
                     }
@@ -170,7 +170,7 @@ namespace ClientSide {
         */
         internal string GenerateData(){
             Random numberOfGUIDS = new Random();
-            int max = numberOfGUIDS.Next(1, 101);
+            int max = numberOfGUIDS.Next(1, 1001);
             string data = string.Empty;
 
             for (int i = 0; i < max; i++){
